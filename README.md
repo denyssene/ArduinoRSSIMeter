@@ -16,7 +16,7 @@ With the config button, there's no need anymore to look for the voltages in RSSI
 
 Press the button in D12 for 1 second to enter in configuration mode.
 - Step 1 - Set the minimum value. It's when your is VRX is On and your VTX is Off. RSSI Meter will show a value comming from your VRX meaning your 0% signal. Press buton to save.
-- Step 2 - Set the maximum value. Now your VRX and your VTX should be turned On and close to each other. Again a value is shown in LCD and this is you 100% RSSI signal. Press button again.
+- Step 2 - Set the maximum value. Now your VRX and your VTX should be turned On and close to each other. Again a value is shown in LCD and this is your 100% RSSI signal. Press button again.
 
 The values are saved in EEPROM. You will need to enter in config again only if you replace your VRX or start using another type of antenna, because these values may be a little different for these changes.
 
