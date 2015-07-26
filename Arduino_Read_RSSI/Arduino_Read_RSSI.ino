@@ -1,8 +1,14 @@
+/*
+ * Arduino RSSI Monitor
+ * 
+ * Main file
+ * 
+ * Author: Denys Sene <denys.sene@gmail.com>
+ */
 
 #include <EEPROM.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-
 #include "Definitions.h"
 
 

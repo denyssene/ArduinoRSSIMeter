@@ -4,15 +4,22 @@
  * Special definitions and
  * custom characters
  * 
- * Author: Denys Sene
+ * Author: Denys Sene <denys.sene@gmail.com>
  */
 
 
+/*
+ * Config structure to save in EEPROM
+ */
 struct config_st {
   uint16_t minValue;
   uint16_t maxValue;
 };
 
+/*
+ * Custom chars
+ * Happy face, sad face, Heart, etc
+ */
 uint8_t happyface[8] = {
   0b00000,
   0b00000,

@@ -1,3 +1,11 @@
+/*
+ * Arduino RSSI Monitor
+ * 
+ * Beep related functions
+ * 
+ * Author: Denys Sene <denys.sene@gmail.com>
+ */
+
 void beep(unsigned char delayms){
   beepOn();           
   delay(delayms);     

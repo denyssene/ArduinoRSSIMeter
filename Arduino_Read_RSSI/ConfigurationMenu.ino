@@ -1,3 +1,10 @@
+/*
+ * Arduino RSSI Monitor
+ * 
+ * Configuration routine
+ * 
+ * Author: Denys Sene <denys.sene@gmail.com>
+ */
 
 void configurationMenu() {
   lcd.clear();
