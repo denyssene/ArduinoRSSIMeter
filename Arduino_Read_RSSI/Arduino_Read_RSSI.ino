@@ -1,85 +1,40 @@
 
-#include <Wire.h> 
+#include <EEPROM.h>
+#include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
+#include "Definitions.h"
+
+
 LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
-int speakerPin = 8;
-unsigned long timeCurrent;
+
+// pinout definitions
+int speakerPin = 8; // speaker pin
+int pushButtonPin = 12; // push button pin
+
+unsigned long currentTime;
 unsigned long timeMarkRssiMonitor;
 unsigned long timeMarkSystem;
 unsigned long timeMarkBeep;
+unsigned long timeButtonMark;
 boolean toggle;
 int oldRssiValue;
 float rssiPercent;
 boolean beepAlarm;
 int beepLevel;
 int beepCount;
-int cursorBeepCount;
-
-
-
-byte happyface[8] = {
-  0b00000,
-  0b00000,
-  0b01010,
-  0b00000,
-  0b00000,
-  0b10001,
-  0b01110,
-  0b00000
-};
-
-byte sadface[8] = {
-  0b00000,
-  0b00000,
-  0b01010,
-  0b00000,
-  0b00000,
-  0b01110,
-  0b10001,
-  0b00000
-};
-
-byte neutralface[8] = {
-  0b00000,
-  0b00000,
-  0b01010,
-  0b00000,
-  0b00000,
-  0b01110,
-  0b00000,
-  0b00000
-};
-
-byte deadface[8] = {
-  0b00000,
-  0b00000,
-  0b11011,
-  0b00000,
-  0b00000,
-  0b01110,
-  0b00000,
-  0b00000
-};
-
-byte heart[8] = {
-  0b00000,
-  0b01010,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b01110,
-  0b00100,
-  0b00000
-};
+int buttonPushedCount;
+boolean isConfigMenu;
+config_st myConfig;
 
 void setup() {
-  
+
   timeMarkRssiMonitor=0;
   timeMarkSystem=0;
   timeMarkBeep=0;
-  cursorBeepCount=0;
-
+  isConfigMenu=false;
+  oldRssiValue=-255;
+  
   lcd.init();
   lcd.backlight();
 
@@ -98,54 +53,68 @@ void setup() {
   beep(50);
   beep(50);
   beep(200);
-
-  oldRssiValue=-255;
+  
+  EEPROM.get(0,myConfig);
+ 
 }
 
-void beep(unsigned char delayms){
-  beepOn();           // Almost any value can be used except 0 and 255
-  delay(delayms);     // wait for a delayms ms
-  beepOff();          // 0 turns it off
-  delay(delayms);     // wait for a delayms ms   
-}  
-
-void beepOn(){
-  analogWrite(speakerPin, 0);
-}  
-
-void beepOff(){
-  analogWrite(speakerPin, 255);
-}  
-
 void loop() {
-  
-  timeCurrent = millis();
+
+  if (isConfigMenu) {
+    configurationMenu();
+  } else {
+    // rssi monitor screen
+    monitorLoop();
+  }
+
+}
+
+void monitorLoop() {
+
+  currentTime = millis();
+
+  // is button pressed for more than a second?
+  // go to config menu
+  if (timeButtonMark<currentTime) {
+    int v = digitalRead(pushButtonPin);
+    if (v==1) {
+      buttonPushedCount++;
+    } else {
+      buttonPushedCount=0;
+    }
+    if (buttonPushedCount>10) {
+      isConfigMenu=true;
+      buttonPushedCount=0;
+    }
+    timeButtonMark=currentTime+100;
+  }
+
 
   // refresh RSSI values every 100ms
-  if (timeCurrent > timeMarkRssiMonitor) {
+  if (currentTime > timeMarkRssiMonitor) {
     updateRssiMonitor();
-    timeMarkRssiMonitor = timeCurrent + 100;
+    timeMarkRssiMonitor = currentTime + 100;
   }
+
   
   // Refresh heart beat every 750ms
-  if (timeCurrent > timeMarkSystem) {
+  if (currentTime > timeMarkSystem) {
     updateSystem();
-    timeMarkSystem = timeCurrent + 750;
+    timeMarkSystem = currentTime + 750;
   }
-  
+
+
   // refresh beep every 50ms
-  if (millis() > timeMarkBeep) {
+  if (currentTime > timeMarkBeep) {
     updateBeep();
-    timeMarkBeep=millis()+50;
+    timeMarkBeep=currentTime+50;
   }
 
 }
 
 void updateSystem() {
   lcd.setCursor(15,0);
-  
   int h=5;
-  
   // update face (
   if (rssiPercent>=25 && rssiPercent <50 ) {
     h=6; //not so happy face
@@ -172,39 +141,6 @@ void updateSystem() {
 }
 
 
-void updateBeep() {
-  if (beepAlarm) {
-    if (beepCount==beepLevel) {
-      beepOn();
-    } else {
-      beepOff();
-    }
-
-    if (beepCount>0) {
-      beepCount--;
-    } else {
-      beepCount=beepLevel;
-    }   
-  }
-  
-}
-
-void setBeepAlarmOn(int bl) {
-  if (bl!=beepLevel) { 
-    beepLevel = bl;
-    beepCount = bl;
-    beepAlarm=true;
-  }
-}
-
-void setBeepAlarmOff() {
-  beepCount = 0;
-  beepLevel = 0;
-  beepAlarm=false;
-  beepOff();
-}
-
-
 void updateRssiMonitor() {
 
   int rssiValue = analogRead(A0);
@@ -215,8 +151,8 @@ void updateRssiMonitor() {
 
   oldRssiValue = rssiValue;
   
-  rssiPercent = map(rssiValue, 23, 881, 0, 100); // Adjust these values
-  float rssiBar = map(rssiValue, 23, 881, 0, 10); // Adjust these values
+  rssiPercent = map(rssiValue, myConfig.minValue, myConfig.maxValue, 0, 100); // Adjust these values
+  float rssiBar = map(rssiValue, myConfig.minValue, myConfig.maxValue, 0, 10); // Adjust these values
   
   if (rssiPercent>=20 && rssiPercent<30) {
     setBeepAlarmOn(40);
