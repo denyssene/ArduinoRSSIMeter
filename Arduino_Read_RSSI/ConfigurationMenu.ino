@@ -14,18 +14,20 @@ void configurationMenu() {
   delay(1000);
 
   lcd.setCursor(0,1);
-  lcd.print("Min Value = ");
+  lcd.print("Min Value: ");
 
   char s[5];
   config_st cfg = {};
   int b = digitalRead(pushButtonPin);
+  float voltage=0.0;
   while (b==0) {
     b=digitalRead(pushButtonPin);
     cfg.minValue=analogRead(A0);
+    voltage = cfg.minValue * (5.0f / 1024);
     delay(100);
-    sprintf(s,"%4d",cfg.minValue);
-    lcd.setCursor(12,1);
-    lcd.print(s);
+    lcd.setCursor(11,1);
+    lcd.print(voltage);
+    lcd.print("V");
     lcd.setCursor(15,1);
   }
 
@@ -33,16 +35,17 @@ void configurationMenu() {
   lcd.print("VRX=On / VTX=On");
   delay(1000);
   lcd.setCursor(0,1);
-  lcd.print("Max Value = ");
+  lcd.print("Max Value:");
 
   b = digitalRead(pushButtonPin);
   while (b==0) {
     b=digitalRead(pushButtonPin);
     cfg.maxValue=analogRead(A0);
+    voltage = cfg.maxValue * (5.0f / 1024);
     delay(100);
-    sprintf(s,"%4d",cfg.maxValue);
-    lcd.setCursor(12,1);
-    lcd.print(s);
+    lcd.setCursor(11,1);
+    lcd.print(voltage);
+    lcd.print("V");
     lcd.setCursor(15,1);
   }
   
