@@ -14,11 +14,11 @@ void beep(unsigned char delayms){
 }  
 
 void beepOn(){
-  analogWrite(speakerPin, 0);
+  digitalWrite(speakerPin, HIGH);
 }  
 
 void beepOff(){
-  analogWrite(speakerPin, 255);
+  digitalWrite(speakerPin, LOW);
 }
 
 void setBeepAlarmOn(int bl) {

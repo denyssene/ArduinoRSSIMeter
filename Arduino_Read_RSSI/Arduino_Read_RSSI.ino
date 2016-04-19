@@ -12,7 +12,9 @@
 #include "Definitions.h"
 
 
-LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+//LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+LiquidCrystal_I2C  lcd(I2C_ADDR,En_pin,Rw_pin,Rs_pin,D4_pin,D5_pin,D6_pin,D7_pin);
+
 
 // pinout definitions
 int speakerPin = 8; // speaker pin
@@ -40,9 +42,16 @@ void setup() {
   timeMarkBeep=0;
   isConfigMenu=false;
   oldRssiValue=-255;
-  
-  lcd.init();
+
+
+  lcd.begin (16,2);  // initialize the lcd 
+  // Switch on the backlight
+  lcd.setBacklightPin(BACKLIGHT_PIN,POSITIVE);
+  lcd.setBacklight(LED_ON);
   lcd.backlight();
+  
+  // lcd.init();
+  //lcd.backlight();
 
   // create a new character
   lcd.createChar(5, happyface);
@@ -52,14 +61,20 @@ void setup() {
   lcd.createChar(9, heart);
 
   lcd.setCursor(0,0);
-  lcd.print("RSSI METER ");
-  
+  lcd.print(" Groundstation  ");
+  lcd.setCursor(0,1);
+  lcd.print("  RSSI Meter    ");  
   pinMode(speakerPin, OUTPUT);
 
   beep(50);
   beep(50);
   beep(200);
   
+  delay(1500);
+
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("RSSI Meter");
   EEPROM.get(0,myConfig);
  
 }

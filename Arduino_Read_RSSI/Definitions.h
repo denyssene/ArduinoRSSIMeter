@@ -7,6 +7,20 @@
  * Author: Denys Sene <denys.sene@gmail.com>
  */
 
+/*
+ * I2C LCD PCF8574T
+ */
+#define I2C_ADDR    0x27
+#define BACKLIGHT_PIN  3
+#define En_pin  2
+#define Rw_pin  1
+#define Rs_pin  0
+#define D4_pin  4
+#define D5_pin  5
+#define D6_pin  6
+#define D7_pin  7
+#define  LED_OFF  1
+#define  LED_ON  0
 
 /*
  * Config structure to save in EEPROM
